@@ -15,7 +15,7 @@ from erezutils import (
     rupdate,
 )
 
-BUCKET = "travisci-test-bucket"
+BUCKET = "erezutils-test-bucket"
 
 
 class RecursiveUpdateTest(unittest.TestCase):
@@ -77,10 +77,7 @@ def test_bucket_access():
     return False
 
 
-# https://docs.travis-ci.com/user/pull-requests/#pull-requests-and-security-restrictions
-@unittest.skipIf(
-    test_bucket_access(), "Access to AWS credentials forbidden on pull requests"
-)
+@unittest.skipIf(test_bucket_access(), "Cannot access AWS bucket")
 class S3OperationsTest(unittest.TestCase):
     # Prevent conflicts between concurrent test runs.
     PREFIX = str(uuid.uuid4())
