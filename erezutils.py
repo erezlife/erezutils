@@ -1,4 +1,5 @@
 import contextlib
+import pathlib
 import tempfile
 from collections.abc import Mapping
 
@@ -42,6 +43,13 @@ def pgpass_escape(s):
 @contextlib.contextmanager
 def pgpass(configs):
     with tempfile.NamedTemporaryFile("w") as f:
+        user_pgpass = pathlib.Path().home() / ".pgpass"
+        try:
+            content = user_pgpass.read_text()
+        except FileNotFoundError:
+            pass
+        else:
+            f.write(content)
         for config in configs:
             f.write(
                 "%s:*:%s:%s:%s\n"
