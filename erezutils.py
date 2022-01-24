@@ -50,6 +50,8 @@ def pgpass(configs):
             pass
         else:
             f.write(content)
+            if not content.endswith("\n"):
+                f.write("\n")
         for config in configs:
             f.write(
                 "%s:*:%s:%s:%s\n"
