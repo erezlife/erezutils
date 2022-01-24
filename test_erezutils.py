@@ -185,3 +185,28 @@ class PGPassTest(unittest.TestCase):
                     )
                 self.assertFalse(os.path.exists(path))
                 self.assertTrue(home_pgpass_path.exists())
+
+    def test_merges_with_user_pgpass_without_line_return(self):
+        with tempfile.TemporaryDirectory() as testdir_cm:
+            testdir = Path(testdir_cm)
+            with unittest.mock.patch("pathlib.Path.home", return_value=testdir):
+                home_pgpass_path = testdir / ".pgpass"
+                with open(home_pgpass_path, "w") as home_pgpass:
+                    home_pgpass.write("somehost:*:dbname:username:Passw0rd!")
+                config = [
+                    {
+                        "name": "db1",
+                        "user": "admin1",
+                        "password": "hunter2",
+                        "host": "localhost",
+                    }
+                ]
+                with pgpass(config) as path:
+                    content = Path(path).read_bytes()
+                    self.assertEqual(
+                        b"somehost:*:dbname:username:Passw0rd!\n"
+                        b"localhost:*:db1:admin1:hunter2\n",
+                        content,
+                    )
+                self.assertFalse(os.path.exists(path))
+                self.assertTrue(home_pgpass_path.exists())
